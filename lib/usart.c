@@ -24,6 +24,8 @@ struct {
 
 uint8_t Write_USART_buffer(uint8_t u8data);
 
+#include "avr_usart.h"
+
 ISR(USART_RX_vect){
 	uint8_t temp = UDR0;
 

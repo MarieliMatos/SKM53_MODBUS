@@ -39,7 +39,7 @@ void USART_Init(uint16_t bauds){
 
 
 /* Send one byte: busy waiting */
-void USART_tx(uint8_t data) {
+void USART_TX(uint8_t data) {
 
 	/* Wait until hardware is ready */
 	while (!(USART_0->UCSR_A & (1 << UDRE0)));
@@ -58,7 +58,7 @@ uint8_t USART_rx() {
 
 
 static int usart_putchar(char c, FILE *fp){
-	USART_tx(c);
+	USART_TX(c);
 
 	return 0;
 }
