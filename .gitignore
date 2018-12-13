@@ -1,0 +1,17 @@
+Release/
+Debug/
+GPATH
+GRTAGS
+GTAGS
+.cproject
+.project
+*~
+.settings/
+*.o
+*.d
+*/.o
+*/.d
+proteus/.workspace
+proteus/*.pdsbak
+*.elf
+*.hex
