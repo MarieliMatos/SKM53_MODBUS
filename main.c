@@ -1,26 +1,29 @@
 /*
  * main.c
  *
- *  Created on: Dec 2, 2016
- *      Author: xtarke
+ *  Created on: Dec 13, 2018
+ *      Author: Mariéli Matos
+ *      		Rafael Nagel
  */
 
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include <util/delay.h>
+#include <string.h>
 
 #include "softuart.h"
 #include "usart.h"
 
-
+#define TRUE 1
+#define FALSE 0
 
 int main(void){
 
-	uint8_t buffer[1];
+  uint8_t buffer[1];
   char protocolo[128];
   char latitude[9], longitude[9];
   uint8_t lat_i = 0, long_i = 0;
-  uint8_t protocolo_i = 0, virgula_counter = 0;
+  uint8_t protocolo_i = 0, virgula_counter = 0, mensagem_que_eu_quero = 0;
 
 	softuart_init();
 	softuart_turn_rx_on(); /* redundant - on by default */
@@ -31,7 +34,7 @@ int main(void){
 
 	while (1){
 
-    if (USART_rx_complete && buffer[0] == '$') {
+    if (USART_rx_complete() && buffer[0] == '$') {
       // começa a ler protocolo blabla
       protocolo_i++;
       protocolo[0] = buffer[0];
@@ -73,9 +76,5 @@ int main(void){
       }
     }
 
-
-
-
-  }
 	return 0;
 }
