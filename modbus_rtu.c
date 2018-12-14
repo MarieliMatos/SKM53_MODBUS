@@ -8,7 +8,10 @@
 
 #include "modbus_rtu.h"
 #include "avr_usart.h"
+
+#include <avr/io.h>
 #include <util/delay.h>
+#include <stdint.h>
 
 void modbus_rtu_init() {
 	USART_Init(B9600);
@@ -66,7 +69,7 @@ void modbus_rtu_tx(uint8_t addr, uint8_t cmd, uint16_t reg, uint16_t data){
 	for(uint8_t i = 0; i<8; i++)
 		USART_tx(pkg[i]);
 
-	_delay_ms_(1000);
+	_delay_ms(1000);
 
 }
 

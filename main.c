@@ -12,7 +12,6 @@
 #include <string.h>
 
 #include "softuart.h"
-#include "usart.h"
 #include "modbus_rtu.h"
 
 #define TRUE 1
