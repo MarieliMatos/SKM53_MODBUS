@@ -58,7 +58,7 @@ uint8_t USART_rx() {
 
 
 static int usart_putchar(char c, FILE *fp){
-	USART_TX(c);
+	USART_tx(c);
 
 	return 0;
 }
