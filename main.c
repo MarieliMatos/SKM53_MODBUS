@@ -20,13 +20,15 @@
 
 int main(void) {
 	char byte;
-	char protocolo[128];
+	char protocolo[6];
+	protocolo[5] = '\0';
+
 	char latitude[10], longitude[10];
+	latitude[9]   = '\0';
+	longitude[9] = '\0';
+
 	uint8_t lat_i = 0, long_i = 0;
-	uint8_t protocolo_i = 0,
-			virgula_counter = 0,
-			mensagem_que_eu_quero = 0,
-			protocolo_iniciado = FALSE;
+	uint8_t protocolo_i = 0, virgula_counter = 0, mensagem_que_eu_quero = 0;
 
 	softuart_init();
 	softuart_turn_rx_on(); /* redundant - on by default */
@@ -42,60 +44,72 @@ int main(void) {
 	sei();
 
 	while (1) {
-		byte = softuart_getchar();
 
-		if (byte == '$') {
-			fprintf(debug, "\n\r'$'");
-			// começa a ler protocolo blabla
-			protocolo_iniciado = TRUE;
+		if (softuart_getchar() == '$') {
+			while (protocolo_i <= 4)
+				protocolo[protocolo_i++] = softuart_getchar();
+
+			if (strstr(protocolo, "GPGGA")) {
+				// msg q eu quero
+				fprintf(debug, "\n\r%s", protocolo);
+				mensagem_que_eu_quero = TRUE;
+			} else {
+				protocolo_i = 0;
+				mensagem_que_eu_quero = FALSE;
+			}
 		}
 
-		if (protocolo_iniciado) {
-			protocolo[protocolo_i++] = byte;
+		if (mensagem_que_eu_quero) {
+			virgula_counter = 0;
+			lat_i = 0;
+			long_i = 0;
 
-			if (protocolo_i == 5) {
-				protocolo[6] = '\0';
-				fprintf(debug, "protocolo: %s\n\r", &protocolo[1]);
-				if (!strcmp("GPGGA", &protocolo[1])) {
-					mensagem_que_eu_quero = TRUE;
-					fprintf(debug, "\n\rmensagem_que_eu_quero");
-				}
-				else
-					protocolo_i = 0;
-			}
-
-			if (mensagem_que_eu_quero) {
-				fprintf(debug, "\n\rGPGGA!");
-				if (byte == ',') {
+			while (virgula_counter < 2) {
+				byte = softuart_getchar();
+				if (byte == ',')
 					virgula_counter++;
-				}
-				if (virgula_counter == 3) {
-					// lê a latitude aqui
-					latitude[lat_i++] = byte;
-				} else if (virgula_counter == 5) {
-					// le a longitude
-					longitude[long_i++] = byte;
-				} else if (virgula_counter > 5) {
-					if (lat_i == 8 && long_i == 8) {
-						// latitude e longitude com tamanhos corretos
-						// envia p/ uart p/ debug
-						latitude[9] = '\0';
-						longitude[9] = '\0';
-						fprintf(debug, "\n\r%s", latitude);
-						fprintf(debug, "\n\r%s", longitude);
+			}
 
-						// zera tudo pra ler proxima mensagem
-						mensagem_que_eu_quero = FALSE;
-						protocolo_i = 0;
-						virgula_counter = 0;
-						lat_i = 0;
-						long_i = 0;
+			// virgula counter sempre igual a dois aqui
+			byte = 0;
+			while (byte != ',') {
+				byte = softuart_getchar();
+				latitude[lat_i++] = byte;
+			}
+			latitude[lat_i-1] = '\0'; // sobreescreve ',' da lat
+			virgula_counter++;
 
-					}
-				}
+			while (softuart_getchar() != ','){};
+
+			// virgula counter sempre igual a quatro aqui
+			byte = 0;
+			while (byte != ',') {
+				byte = softuart_getchar();
+				longitude[long_i++] = byte;
+			}
+			longitude[long_i-1] = '\0';
+			virgula_counter++;
+
+			fprintf(debug, "\n\r %i %i", long_i, lat_i);
+
+			if (long_i == 10 && lat_i == 10) {
+				fprintf(debug, "\n\r tamanhos OK");
+			}
+
+			fprintf(debug, "\n\r latitude: %s", latitude);
+			fprintf(debug, "\n\r longtitude: %s", longitude);
+
+			// zera tudo pra ler proxima mensagem
+			mensagem_que_eu_quero = FALSE;
+			protocolo_i = 0;
+
+			for (int i = 0; i <= 4; i++)
+				protocolo[i++] = 0;
+			for (int i = 0; i <= 8; i++) {
+				latitude[i] = 0;
+				longitude[i] = 0;
 			}
 		}
-
 	}
 
 	return 0;
