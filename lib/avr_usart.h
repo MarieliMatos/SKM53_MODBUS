@@ -44,7 +44,7 @@ typedef struct
 void USART_Init(uint16_t bauds);
 FILE * get_usart_stream();
 
-void USART_TX(uint8_t data);
+void USART_tx(uint8_t data);
 uint8_t USART_rx();
 
 

@@ -13,10 +13,29 @@
 
 #include "softuart.h"
 #include "usart.h"
-#include "avr_usart.h"
+#include "modbus_rtu.h"
 
 #define TRUE 1
 #define FALSE 0
+
+static uint8_t char_to_int(char ch) {
+	return (uint8_t)ch - '0';
+}
+
+static uint8_t str_nibble_to_uint8(char *str_nibble) {
+	return 	char_to_int(str_nibble[0]) +
+			char_to_int(str_nibble[1])*10 +
+			char_to_int(str_nibble[2])*100 +
+			char_to_int(str_nibble[3])*1000;
+}
+
+static uint16_t str_to_uint(char *str) {
+	uint8_t nibble_ms, nibble_ls;
+	nibble_ms = str_nibble_to_uint8(&str[5]);
+	nibble_ls = str_nibble_to_uint8(&str[0]);
+
+	return nibble_ms*1000 + nibble_ls;
+}
 
 int main(void) {
 	char byte;
@@ -33,14 +52,6 @@ int main(void) {
 	softuart_init();
 	softuart_turn_rx_on(); /* redundant - on by default */
 
-	/* Obtem o stream de depuração */
-	FILE *debug = get_usart_stream();
-	USART_Init(B9600);
-
-	/* Mensagem incial: terminal do Proteus
-	 * utiliza final de linha com '\r' */
-	fprintf(debug, "Teste de debug\n\r");
-
 	sei();
 
 	while (1) {
@@ -50,8 +61,6 @@ int main(void) {
 				protocolo[protocolo_i++] = softuart_getchar();
 
 			if (strstr(protocolo, "GPGGA")) {
-				// msg q eu quero
-				fprintf(debug, "\n\r%s", protocolo);
 				mensagem_que_eu_quero = TRUE;
 			} else {
 				protocolo_i = 0;
@@ -90,14 +99,11 @@ int main(void) {
 			longitude[long_i-1] = '\0';
 			virgula_counter++;
 
-			fprintf(debug, "\n\r %i %i", long_i, lat_i);
-
-			if (long_i == 10 && lat_i == 10) {
-				fprintf(debug, "\n\r tamanhos OK");
+			if (long_i >= 10 && lat_i >= 10) {
+				//modbus_rtu_tx(0x15, 0x01, 0x5, );
+				modbus_rtu_tx(0x15, 0x01, 0x05, str_to_uint(latitude));
+				modbus_rtu_tx(0x15, 0x01, 0x06, str_to_uint(longitude));
 			}
-
-			fprintf(debug, "\n\r latitude: %s", latitude);
-			fprintf(debug, "\n\r longtitude: %s", longitude);
 
 			// zera tudo pra ler proxima mensagem
 			mensagem_que_eu_quero = FALSE;
