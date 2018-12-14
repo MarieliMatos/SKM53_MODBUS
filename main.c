@@ -99,7 +99,6 @@ int main(void) {
 			virgula_counter++;
 
 			if (long_i >= 10 && lat_i >= 10) {
-				//modbus_rtu_tx(0x15, 0x01, 0x5, );
 				modbus_rtu_tx(0x15, 0x01, 0x05, str_to_uint(latitude));
 				modbus_rtu_tx(0x15, 0x01, 0x06, str_to_uint(longitude));
 			}

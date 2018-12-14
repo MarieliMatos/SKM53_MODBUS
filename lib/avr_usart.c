@@ -56,7 +56,6 @@ uint8_t USART_rx() {
 	return USART_0->UDR_;
 }
 
-
 static int usart_putchar(char c, FILE *fp){
 	USART_tx(c);
 
