@@ -33,11 +33,9 @@ static uint16_t str_nibble_to_uint16(char *str_nibble) {
 }
 
 static uint16_t str_to_uint(char *str) {
-	uint16_t nibble_ms, nibble_ls;
-	nibble_ms = str_nibble_to_uint16(&str[0]);
-	nibble_ls = str_nibble_to_uint16(&str[5]);
-
-	return nibble_ms*10000 + nibble_ls;
+	uint16_t nibble_ms;
+	nibble_ms = str_nibble_to_uint16(&str[1]);
+	return nibble_ms*10 + char_to_int(str[6]);
 }
 
 int main(void) {
@@ -45,7 +43,7 @@ int main(void) {
 	char protocolo[6];
 	protocolo[5] = '\0';
 
-	char latitude[10], longitude[10];
+	char latitude[11], longitude[11];
 	latitude[9]   = '\0';
 	longitude[9] = '\0';
 
@@ -87,6 +85,7 @@ int main(void) {
 
 			// virgula counter sempre igual a dois aqui
 			byte = 0;
+			latitude[lat_i++] = 0; // pra ficar igual tamanho da longitude (10 bytes)
 			while (byte != ',') {
 				byte = softuart_getchar();
 				latitude[lat_i++] = byte;
@@ -106,7 +105,7 @@ int main(void) {
 			virgula_counter++;
 
 
-			if (long_i >= 10 && lat_i >= 10) {
+			if (long_i >= 11 && lat_i >= 11) {
 				//fprintf(debug, "\r\n%s %s", latitude, longitude);
 
 				modbus_rtu_tx(0x15, 0x01, 0x05, str_to_uint(latitude));
@@ -119,7 +118,7 @@ int main(void) {
 
 			for (int i = 0; i <= 4; i++)
 				protocolo[i++] = 0;
-			for (int i = 0; i <= 8; i++) {
+			for (int i = 0; i <= 9; i++) {
 				latitude[i] = 0;
 				longitude[i] = 0;
 			}
