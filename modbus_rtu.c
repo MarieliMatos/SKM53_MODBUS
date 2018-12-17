@@ -13,6 +13,42 @@
 #include <util/delay.h>
 #include <stdint.h>
 
+static volatile uint8_t pkg_rx[8];
+static uint8_t rx_j = 0;
+
+/*
+ * modbus_rts_reply:
+ * 0: mensagem correta
+ * 1: crc invalido
+ * 2: reg invalido
+ */
+static uint8_t modbus_rtu_reply = 0;
+
+ISR(USART_RX_vect) {
+	pkg_rx[rx_j++] = USART_0->UDR_;
+	if (rx_j == 1) {
+		switch (pkg_rx[rx_j]) {
+		case 0x01:
+			modbus_rtu_reply = 0;
+			break;
+		case 0xff:
+			modbus_rtu_reply = 1;
+			break;
+		case 0xfe:
+			modbus_rtu_reply = 2;
+			break;
+		}
+		rx_j = 0;
+	}
+
+	return -1;
+}
+
+uint8_t modbus_rtu_get_reply()
+{
+	return modbus_rtu_reply;
+}
+
 void modbus_rtu_init() {
 	USART_Init(B9600);
 }
@@ -50,7 +86,6 @@ static uint16_t CRC16_2(uint8_t *buf, int len)
 
 void modbus_rtu_tx(uint8_t addr, uint8_t cmd, uint16_t reg, uint16_t data){
 	uint8_t pkg[8];
-	//char rx_pkg[16];
 	uint16_t crc = 0;
 
 	pkg[0] = addr;
@@ -71,7 +106,6 @@ void modbus_rtu_tx(uint8_t addr, uint8_t cmd, uint16_t reg, uint16_t data){
 		USART_tx(pkg[i]);
 
 	_delay_ms(1000);
-
 }
 
 

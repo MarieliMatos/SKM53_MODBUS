@@ -14,5 +14,6 @@
 
 void modbus_rtu_init();
 void modbus_rtu_tx(uint8_t addr, uint8_t cmd, uint16_t reg, uint16_t data);
+uint8_t modbus_rtu_get_reply();
 
 #endif /* MODBUS_RTU_H_ */

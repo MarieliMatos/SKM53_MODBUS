@@ -104,12 +104,24 @@ int main(void) {
 			longitude[long_i-1] = '\0';
 			virgula_counter++;
 
-
 			if (long_i >= 11 && lat_i >= 11) {
 				//fprintf(debug, "\r\n%s %s", latitude, longitude);
 
 				modbus_rtu_tx(0x15, 0x01, 0x05, str_to_uint(latitude));
+				if (!modbus_rtu_get_reply())  {
+					// mensagem OK! Enviada com sucesso.
+				}
+				else {
+					// mensagem c/ ERRO! Enviada sem sucesso.
+				}
 				modbus_rtu_tx(0x15, 0x01, 0x06, str_to_uint(longitude));
+				if (!modbus_rtu_get_reply())  {
+					// mensagem OK! Enviada com sucesso.
+				}
+				else {
+					// mensagem c/ ERRO! Enviada sem sucesso.
+				}
+
 			}
 
 			// zera tudo pra ler proxima mensagem
