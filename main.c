@@ -11,6 +11,7 @@
 #include <util/delay.h>
 #include <string.h>
 
+#include "avr_usart.h"
 #include "softuart.h"
 #include "modbus_rtu.h"
 
@@ -18,7 +19,10 @@
 #define FALSE 0
 
 static uint8_t char_to_int(char ch) {
-	return (uint8_t)ch - '0';
+	if (ch >= 48 && ch <= 57)
+		return (uint8_t)ch - '0';
+
+	return 0;
 }
 
 static uint8_t str_nibble_to_uint8(char *str_nibble) {
@@ -47,6 +51,9 @@ int main(void) {
 
 	uint8_t lat_i = 0, long_i = 0;
 	uint8_t protocolo_i = 0, virgula_counter = 0, mensagem_que_eu_quero = 0;
+
+	modbus_rtu_init();
+	//FILE *debug = get_usart_stream();
 
 	softuart_init();
 	softuart_turn_rx_on(); /* redundant - on by default */
@@ -98,7 +105,10 @@ int main(void) {
 			longitude[long_i-1] = '\0';
 			virgula_counter++;
 
+
 			if (long_i >= 10 && lat_i >= 10) {
+				//fprintf(debug, "\r\n%s %s", latitude, longitude);
+
 				modbus_rtu_tx(0x15, 0x01, 0x05, str_to_uint(latitude));
 				modbus_rtu_tx(0x15, 0x01, 0x06, str_to_uint(longitude));
 			}

@@ -61,7 +61,7 @@ void modbus_rtu_tx(uint8_t addr, uint8_t cmd, uint16_t reg, uint16_t data){
 	pkg[4] = data & 0x00FF;
 	pkg[5] = data >> 8;
 
-	crc = CRC16_2(pkg, 5);
+	crc = CRC16_2(pkg, 6);
 
 	pkg[6] = crc >> 8;
 	pkg[7] = crc & 0x00FF;
