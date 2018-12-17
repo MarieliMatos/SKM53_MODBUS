@@ -25,19 +25,19 @@ static uint8_t char_to_int(char ch) {
 	return 0;
 }
 
-static uint8_t str_nibble_to_uint8(char *str_nibble) {
-	return 	char_to_int(str_nibble[0]) +
-			char_to_int(str_nibble[1])*10 +
-			char_to_int(str_nibble[2])*100 +
-			char_to_int(str_nibble[3])*1000;
+static uint16_t str_nibble_to_uint16(char *str_nibble) {
+	return 	char_to_int(str_nibble[3]) +
+			char_to_int(str_nibble[2])*10 +
+			char_to_int(str_nibble[1])*100 +
+			char_to_int(str_nibble[0])*1000;
 }
 
 static uint16_t str_to_uint(char *str) {
-	uint8_t nibble_ms, nibble_ls;
-	nibble_ms = str_nibble_to_uint8(&str[5]);
-	nibble_ls = str_nibble_to_uint8(&str[0]);
+	uint16_t nibble_ms, nibble_ls;
+	nibble_ms = str_nibble_to_uint16(&str[0]);
+	nibble_ls = str_nibble_to_uint16(&str[5]);
 
-	return nibble_ms*1000 + nibble_ls;
+	return nibble_ms*10000 + nibble_ls;
 }
 
 int main(void) {

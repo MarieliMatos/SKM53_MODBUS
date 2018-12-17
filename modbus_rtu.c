@@ -49,17 +49,18 @@ static uint16_t CRC16_2(uint8_t *buf, int len)
 //}
 
 void modbus_rtu_tx(uint8_t addr, uint8_t cmd, uint16_t reg, uint16_t data){
-	char pkg[8];
+	uint8_t pkg[8];
+	//char rx_pkg[16];
 	uint16_t crc = 0;
 
 	pkg[0] = addr;
 	pkg[1] = cmd;
 
-	pkg[2] = reg & 0x00FF;
-	pkg[3] = reg >> 8;
+	pkg[2] = reg >> 8;
+	pkg[3] = reg & 0x00FF;
 
-	pkg[4] = data & 0x00FF;
-	pkg[5] = data >> 8;
+	pkg[4] = data >> 8;
+	pkg[5] = data & 0x00FF;
 
 	crc = CRC16_2(pkg, 6);
 
