@@ -4,7 +4,7 @@ INCLUDES = -Ilib -I/usr/lib/avr/include -I/usr/lib/gcc/avr/5.4.0/include	\
 -I/usr/lib/gcc/avr/5.4.0/include-fixed
 CFLAGS := -Wall -Os -fpack-struct -fshort-enums -ffunction-sections	\
 -fdata-sections -std=gnu99 -funsigned-char -funsigned-bitfields			\
--mmcu=atmega328p -DF_CPU=8000000UL -MMD -MP $(INCLUDES)
+-mmcu=atmega328p -DF_CPU=16000000UL -MMD -MP $(INCLUDES)
 LDLIBS = 
 LDFLAGS = -mmcu=atmega328p
 
